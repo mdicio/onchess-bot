@@ -40,7 +40,14 @@ class ChessBot:
         # If none of the above conditions are met, the game is still ongoing
         return False, None
 
-    def play_game(self, playing_as="white", mode="auto", timeout=10, loop_speed=0.1):
+    def play_game(
+        self,
+        playing_as="white",
+        mode="auto",
+        move_speed="normal",
+        timeout=10,
+        loop_speed=0.1,
+    ):
         """
         Play a game against the computer by interacting with the web-based chessboard.
         """
@@ -57,6 +64,11 @@ class ChessBot:
 
         self.chess_engine.setup_board()
         self.chess_engine.setup_engine()
+
+        # Generate the pixel mappings
+        square_pixel_mapping = self.web_interface.generate_square_pixel_mapping(
+            playing_as
+        )
 
         # Handle initial computer move when playing as Black
         if self.playing_as == "black":
@@ -80,7 +92,12 @@ class ChessBot:
         while not self.chess_engine.is_game_over():
             # Get the best move from the engine
             self.chess_engine.set_fen_position()  # Update engine with the current position
-            best_move = self.chess_engine.get_best_move()
+
+            if move_speed == "normal":
+                best_move = self.chess_engine.get_best_move()
+            else:
+                best_move = self.chess_engine.get_best_move_tc(200)
+
             print(f"Best move: {best_move}")
 
             # Translate the best move to web-based interaction (start and end squares)
@@ -90,7 +107,9 @@ class ChessBot:
             print(f"Performing move: {start_square} to {end_square}")
 
             # Perform the move on the web interface
-            self.web_interface.drag_and_drop_by_square(start_square, end_square)
+            self.web_interface.drag_and_drop_by_square(
+                square_pixel_mapping, start_square, end_square
+            )
             if self.chess_engine.is_promotion(best_move):
                 self.web_interface.handle_pawn_promotion(best_move)
 
@@ -130,4 +149,4 @@ class ChessBot:
                 break
 
         # Send quit command to the engine
-        self.chess_engine.send_quit_command()
+        self.chess_engine.quit()

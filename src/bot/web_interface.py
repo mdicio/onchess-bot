@@ -316,11 +316,12 @@ class WebInterface:
 
         return None
 
-    def drag_and_drop_by_square(self, start_square, end_square, playing_as="white"):
+    def drag_and_drop_by_square(
+        self, square_pixel_mapping, start_square, end_square, playing_as="white"
+    ):
         try:
-            # Generate the pixel mappings
-            square_pixel_mapping = self.generate_square_pixel_mapping(playing_as)
 
+            t0 = time.time()
             # Find the starting piece element
             start_piece = self.find_piece_element_for_square(
                 start_square, square_pixel_mapping
@@ -340,12 +341,16 @@ class WebInterface:
             # Create an ActionChains object
             actions = ActionChains(self.browser)
 
+            actions.w3c_actions.pointer_action._duration = 0
+
             # Perform the drag-and-drop action using the piece element
             actions.click_and_hold(start_piece).move_by_offset(
                 end_pixel[0] - start_pixel[0], end_pixel[1] - start_pixel[1]
             ).release().perform()
 
-            print(f"Dragged from {start_square} to {end_square}.")
+            print(
+                f"Dragged from {start_square} to {end_square} in {time.time() - t0} seconds."
+            )
 
         except Exception as e:
             print(f"Error in drag and drop by square: {e}")
@@ -359,20 +364,10 @@ class WebInterface:
         - browser: The Selenium WebDriver instance.
         - move_san: The SAN string of the move, e.g., 'g8=Q' for a promotion to queen.
         """
-        promotion_match = re.match(r"([a-h][18])=(Q|N|R|B)([+#]?)", move_san)
+        promotion_match = re.match(r"([a-h][1-8])([a-h][1-8])(q|r|b|n)", move_san)
 
-        if not promotion_match:
-            print("No prmotion detected")
-            return
-
-        else:
-
-            promotion_square, promotion_piece, check_or_mate = promotion_match.groups()
-            print(
-                f"Promotion to {promotion_piece} on {promotion_square} with {check_or_mate if check_or_mate else 'no check or checkmate'}"
-            )
-
-            # Wait until the promotion choice UI is visible (with the correct ID)
+        if promotion_match:
+            start_square, end_square, promotion_piece = promotion_match.groups()
             try:
                 promotion_choice_element = WebDriverWait(self.browser, 10).until(
                     EC.visibility_of_element_located((By.ID, "promotion-choice"))
@@ -383,10 +378,10 @@ class WebInterface:
 
             # Define a mapping of piece notation to the expected CSS class
             piece_class_mapping = {
-                "Q": "queen",
-                "N": "knight",
-                "R": "rook",
-                "B": "bishop",
+                "q": "queen",
+                "n": "knight",
+                "r": "rook",
+                "b": "bishop",
             }
 
             # Get the piece class to select (e.g., 'queen', 'knight', etc.)
@@ -416,6 +411,10 @@ class WebInterface:
                     print(f"Could not find the promotion piece: {promotion_piece}")
             except NoSuchElementException:
                 print(f"Error: Could not find elements for promotion selection.")
+
+        else:
+            print("No promotion detected")
+            return
 
     def detect_last_table_move_and_count(self, playing_as="white"):
         """

@@ -1,5 +1,6 @@
 import chess
 from stockfish import Stockfish
+import re
 
 
 class ChessEngine:
@@ -21,6 +22,12 @@ class ChessEngine:
         Get the best move from the chess engine in UCI format.
         """
         return self.engine.get_best_move()
+
+    def get_best_move_tc(self, tc):
+        """
+        Get the best move from the chess engine in UCI format.
+        """
+        return self.engine.get_best_move_time(tc)
 
     def translate_move_to_web(self, move):
         """
@@ -73,10 +80,16 @@ class ChessEngine:
         """
         Checks if the move is a pawn promotion.
         """
-        return "=" in move_san
+        promotion_match = re.match(r"([a-h][1-8])([a-h][1-8])(q|r|b|n)", move_san)
+        if promotion_match:
+            start_square, end_square, promotion_piece = promotion_match.groups()
+            print(
+                f"Start square: {start_square}, End square: {end_square}, Promotion piece: {promotion_piece}"
+            )
+            return True
 
-    def send_quit_command(self):
+    def quit(self):
         """
         Sends a quit command to the chess engine (if needed).
         """
-        self.engine.quit()
+        self.engine.send_quit_command()
