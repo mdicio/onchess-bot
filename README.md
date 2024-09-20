@@ -65,8 +65,66 @@ The `tests/` directory contains unit tests for the bot’s core functionality. U
 - **Stockfish engine integration** and move generation.
 - **Web interface interactions** like piece dragging and move detection.
 
-### How to Run the Project
+### How to Use
+
+Once you've set up and run the project, you can use the bot to play chess on a supported online platform, typically against the computer. Below are the key steps to interact with and control the chess bot.
 
 1. **Install Requirements:**
    ```bash
    pip install -r requirements.txt
+   
+2. **Initialize the Chess Bot:**
+
+   In your Python script or Jupyter notebook, initialize the bot by creating instances of the required classes.
+
+   ```python
+   from bot.web_interface import WebInterface
+   from bot.chess_engine import ChessEngine
+   from bot.chess_bot import ChessBot
+
+   # Initialize the Web Interface
+   web_interface = WebInterface(browser='chrome')  # Or 'firefox', depending on the browser you are using
+
+   # Initialize the Chess Engine
+   chess_engine = ChessEngine(stockfish_path="../path_to_stockfish/stockfish")
+
+   # Initialize the Chess Bot
+   bot = ChessBot(web_interface=web_interface, chess_engine=chess_engine, playing_as="white")  # or 'black'
+
+3. **Navigate to Play Against the Computer::**
+
+   The bot will automatically navigate to the "Play against computer" page of the online chess platform using the Web Interface class.
+   
+   ```python
+   
+   web_interface.navigate_to_computer_play()
+
+Start Playing:
+
+You can now start the game by calling the play_game() method. The bot will play according to the color you have selected (white or black). The bot uses Stockfish to calculate the best move and automates playing via Selenium WebDriver.
+
+python
+
+bot.play_game(timeout=100)  # Timeout can be adjusted to control waiting time for moves
+
+Customizing the Game:
+
+    Change Stockfish Difficulty: If you want to adjust the difficulty of Stockfish, you can set the skill level or depth in the ChessEngine initialization:
+
+    python
+
+chess_engine = ChessEngine(stockfish_path="../path_to_stockfish/stockfish", skill_level=10, engine_depth=15)
+
+Set Computer Opponent Level: You can adjust the level of the computer opponent on the chess platform via the WebInterface class:
+
+python
+
+web_interface.select_computer_level(level=5)
+
+Set Player's Color: To choose whether you want to play as white, black, or let the computer decide randomly, set the color accordingly:
+
+python
+
+web_interface.select_color(color='white')  # Options are 'white', 'black', or 'random'
+
+   
