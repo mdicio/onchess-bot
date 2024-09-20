@@ -1,0 +1,3 @@
+https://python-chess.readthedocs.io/en/latest/
+https://github.com/rogerfitz/tutorials/blob/master/python_chess/0_Chess_Basics.ipynb
+https://stockfishchess.org/download/linux/

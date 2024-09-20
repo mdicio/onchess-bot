@@ -1,0 +1,8 @@
+selenium==4.24.0
+chess
+stockfish
+PyYAML
+pytest
+jupyter
+ipykernel
+undetected-chromedriver==3.5.5

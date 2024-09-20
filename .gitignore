@@ -1,0 +1,101 @@
+logs/
+__pycache__/
+*.pyc
+
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.virtualenv/
+
+# Logs and output files
+logs/
+*.log
+*.out
+*.err
+
+# Stockfish binaries and compiled files (you can adjust the path if needed)
+stockfish/
+*.bin
+*.exe
+*.so
+*.dylib
+
+# Config files for Stockfish path and secrets
+config/*.yaml
+config/*.json
+config/*.ini
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE and editor-specific files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Unit test / coverage reports
+htmlcov/
+*.cover
+.coverage
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+*.coveragerc
+
+# pyenv
+.python-version
+
+# Testing results
+*.pytest_cache/
+.tox/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Documentation files
+docs/_build/
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+*.old
+
+# Jupyter Notebook metadata
+.ipynb_checkpoints/
+
+# Linting cache
+.mypy_cache/
+pylint-report.txt
+pylint-report.json
+
+# PyCharm-specific files
+.idea/
+
+# Pycharm/JetBrains specific
+.idea/
+# VSCode specific files
+.vscode/
+
+# MacOS-specific files
+.DS_Store
+
+# Environment variables
+.env
