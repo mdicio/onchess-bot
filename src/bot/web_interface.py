@@ -416,7 +416,9 @@ class WebInterface:
             print("No promotion detected")
             return
 
-    def detect_last_table_move_and_count(self, playing_as="white"):
+    def detect_last_table_move_and_count(
+        self, previous_move_count=0, playing_as="white"
+    ):
         """
         Detects the computer's move from the move table and ensures the move count has increased.
 
@@ -441,17 +443,23 @@ class WebInterface:
             # Get the total count of moves from all elements (both white and black)
             current_move_count = len(move_elements)
 
-            # Get the last move element (latest move made)
-            if playing_as == "white":
+            # Early exit if no new move has been made
+            if current_move_count == previous_move_count:
+                return None, current_move_count
 
-                last_move_element = move_elements[-1]
-            else:
-                last_move_element = move_elements[-2]
+            # Get the last move element (latest move made)
+
+            last_move_element = move_elements[-1]
 
             computer_move = last_move_element.text.strip()  # Extract the move text
 
-            # Return the detected move and the updated move count
-            return computer_move, current_move_count
+            # Determine if the last move is from the computer
+            if (playing_as == "white" and current_move_count % 2 == 0) or (
+                playing_as == "black" and current_move_count % 2 == 1
+            ):
+                return computer_move, current_move_count
+            else:
+                return None, current_move_count  # Last move is not the computer's
 
         except (NoSuchElementException, TimeoutException):
             print("Move history table or move element not found.")
@@ -485,20 +493,25 @@ class WebInterface:
         """
         start_time = time.time()  # Record the start time
 
+        n = 0
         while True:
+            n += 1
             # Detect the current move and move count
             last_move, current_move_count = self.detect_last_table_move_and_count(
-                playing_as
+                previous_move_count, playing_as
             )
 
             # Check if the move count has increased and the last move is different
             if current_move_count > previous_move_count and last_move != previous_move:
-                print(f"New computer move detected: {last_move}")
-                return last_move
+                if last_move:  # Ensure last_move is not None
+                    print(f"New computer move detected: {last_move}")
+                    return last_move
 
             # Optional: Print status for debugging
             print(
-                f"Waiting for new computer move... (Current move count: {current_move_count})"
+                f"Waiting for new computer move... (Current move count: {current_move_count}, num tries: {n})",
+                end="\r",  # Return to the start of the line
+                flush=True,  # Force print without buffering
             )
 
             # Check if the timeout has been reached

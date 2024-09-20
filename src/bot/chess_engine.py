@@ -1,6 +1,7 @@
 import chess
 from stockfish import Stockfish
 import re
+import random as rd
 
 
 class ChessEngine:
@@ -21,13 +22,32 @@ class ChessEngine:
         """
         Get the best move from the chess engine in UCI format.
         """
-        return self.engine.get_best_move()
 
-    def get_best_move_tc(self, tc):
+    def get_best_move(self, move_speed, deceive):
         """
         Get the best move from the chess engine in UCI format.
         """
-        return self.engine.get_best_move_time(tc)
+        if move_speed == "normal":
+            return self.engine.get_best_move()
+        elif move_speed == "bullet":
+            tc = rd.uniform(100, 1000)
+
+            if deceive:
+                # n = rd.uniform(2, 10)
+                best_move = self.engine.get_best_move_time(tc)
+                return best_move
+            else:
+                return self.engine.get_best_move_time(200)
+
+        elif move_speed == "ultra_bullet":
+            tc = rd.uniform(10, 20)
+
+            if deceive:
+                # n = rd.uniform(2, 10)
+                best_move = self.engine.get_best_move_time(tc)
+                return best_move
+            else:
+                return self.engine.get_best_move_time(50)
 
     def translate_move_to_web(self, move):
         """
@@ -79,14 +99,18 @@ class ChessEngine:
     def is_promotion(self, move_san):
         """
         Checks if the move is a pawn promotion.
+        Promotion is indicated by a final 'n', 'b', 'q', or 'r', possibly followed by '+' or '#'.
         """
-        promotion_match = re.match(r"([a-h][1-8])([a-h][1-8])(q|r|b|n)", move_san)
-        if promotion_match:
-            start_square, end_square, promotion_piece = promotion_match.groups()
-            print(
-                f"Start square: {start_square}, End square: {end_square}, Promotion piece: {promotion_piece}"
+        # Check if the move is long enough to include a promotion
+        if len(move_san) > 4:
+            # Check second-to-last or last character for promotion piece
+            return (
+                move_san[-2] in "nbrq"
+                if move_san[-1] in "+#"
+                else move_san[-1] in "nbrq"
             )
-            return True
+
+        return False
 
     def quit(self):
         """
